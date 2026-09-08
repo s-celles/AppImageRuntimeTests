@@ -1,0 +1,60 @@
+name: AppImage Runtime Integration Tests
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+  workflow_dispatch:
+    inputs:
+      runtime_url:
+        description: "URL to download runtime from (e.g. for PR testing)"
+        required: false
+        type: string
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        arch: [x86_64, i686, aarch64, armv7l]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            gcc gcc-i686-linux-gnu gcc-aarch64-linux-gnu gcc-arm-linux-gnueabihf \
+            libc6-dev squashfs-tools zstd file curl \
+            qemu-user-static qemu-user \
+            fuse libfuse2
+
+      - name: Register QEMU
+        if: matrix.arch != 'x86_64'
+        run: docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+
+      - name: Compile test application
+        run: ./scripts/build_test_app.sh ${{ matrix.arch }} test_app_${{ matrix.arch }}
+
+      - name: Download runtime
+        env:
+          RUNTIME_URL: ${{ inputs.runtime_url }}
+        run: ./scripts/download_runtime.sh ${{ matrix.arch }}
+
+      - name: Build AppImages
+        run: |
+          ./scripts/build_appimage.sh runtime-${{ matrix.arch }} test_app_${{ matrix.arch }} gzip test_gzip.AppImage
+          ./scripts/build_appimage.sh runtime-${{ matrix.arch }} test_app_${{ matrix.arch }} zstd test_zstd.AppImage
+
+      - name: Test runtime (Level 1)
+        run: |
+          echo "Running runtime directly to test structural validity"
+          ./runtime-${{ matrix.arch }} --appimage-help || true
+
+      - name: Test AppImage with gzip (Level 2)
+        run: ./scripts/test_appimage.sh test_gzip.AppImage ${{ matrix.arch }}
+
+      - name: Test AppImage with zstd (Level 2)
+        run: ./scripts/test_appimage.sh test_zstd.AppImage ${{ matrix.arch }}

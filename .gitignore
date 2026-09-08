@@ -1,0 +1,33 @@
+# Ignore everything
+*
+# But not these directories
+!*/
+
+# Explicitly allow files
+!/.gitignore
+!/README.md
+!/LICENSE
+!/CHANGELOG.md
+!/justfile
+
+# Allow test files
+!/tests/test_app.c
+
+# Allow scripts
+!/scripts/build_appimage.sh
+!/scripts/build_test_app.sh
+!/scripts/download_runtime.sh
+!/scripts/test_appimage.sh
+
+# Allow github workflows
+!/.github/workflows/test.yml
+
+# Allow docs
+!/docs/make.jl
+!/docs/src/
+!/docs/src/index.md
+
+# Ignore generated binaries and appimages explicitly (just in case)
+*.AppImage
+runtime-*
+test_app_*

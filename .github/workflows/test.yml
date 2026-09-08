@@ -18,7 +18,20 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        arch: [x86_64, i686, aarch64, armv7l, powerpc64le, riscv64]
+        include:
+          - arch: x86_64
+            experimental: false
+          - arch: i686
+            experimental: false
+          - arch: aarch64
+            experimental: false
+          - arch: armv7l
+            experimental: false
+          - arch: powerpc64le
+            experimental: true
+          - arch: riscv64
+            experimental: true
+    continue-on-error: ${{ matrix.experimental }}
     steps:
       - uses: actions/checkout@v4
 

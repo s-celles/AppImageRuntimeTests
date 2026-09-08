@@ -26,7 +26,14 @@ else
 fi
 
 echo "Downloading runtime for $ARCH from $URL"
-curl -sL "$URL" -o "$OUTPUT_FILE"
+HTTP_STATUS=$(curl -sL -w "%{http_code}" "$URL" -o "$OUTPUT_FILE")
+
+if [ "$HTTP_STATUS" != "200" ] && [ "$HTTP_STATUS" != "302" ]; then
+    echo "Error: Failed to download runtime. HTTP Status: $HTTP_STATUS"
+    echo "This architecture might not be published by the upstream source yet."
+    exit 1
+fi
+
 chmod +x "$OUTPUT_FILE"
 
 echo "Downloaded $OUTPUT_FILE"

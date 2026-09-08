@@ -7,8 +7,8 @@ on:
     branches: [ "main" ]
   workflow_dispatch:
     inputs:
-      runtime_url:
-        description: "URL to download runtime from (e.g. for PR testing)"
+      buildkite_build:
+        description: "Buildkite Build Number (e.g. 32624) to download artifacts from"
         required: false
         type: string
 
@@ -54,7 +54,7 @@ jobs:
 
       - name: Download runtime
         env:
-          RUNTIME_URL: ${{ inputs.runtime_url }}
+          BUILDKITE_BUILD: ${{ inputs.buildkite_build }}
         run: ./scripts/download_runtime.sh ${{ matrix.arch }}
 
       - name: Build AppImages

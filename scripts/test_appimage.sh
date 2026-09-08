@@ -23,11 +23,28 @@ else
     echo "WARNING: /dev/fuse does NOT exist."
 fi
 
+QEMU=""
+if [ "$ARCH" = "aarch64" ]; then
+    QEMU="qemu-aarch64-static"
+elif [ "$ARCH" = "armv7l" ]; then
+    QEMU="qemu-arm-static"
+elif [ "$ARCH" = "i686" ]; then
+    # Native on x86_64 or explicit qemu if needed
+    QEMU=""
+fi
+
+if [ -n "$QEMU" ]; then
+    echo "Using explicit interpreter: $QEMU"
+    CMD="$QEMU ./$APPIMAGE"
+else
+    CMD="./$APPIMAGE"
+fi
+
 echo "Running AppImage..."
 
 # Capture stdout and stderr
 set +e
-OUTPUT=$(./"$APPIMAGE" 2>&1)
+OUTPUT=$($CMD 2>&1)
 EXIT_CODE=$?
 set -e
 
@@ -38,7 +55,7 @@ if [ $EXIT_CODE -ne 0 ]; then
     
     echo "Checking FUSE fallback with --appimage-extract-and-run..."
     set +e
-    OUTPUT_FALLBACK=$(./"$APPIMAGE" --appimage-extract-and-run 2>&1)
+    OUTPUT_FALLBACK=$($CMD --appimage-extract-and-run 2>&1)
     EXIT_CODE_FALLBACK=$?
     set -e
     

@@ -51,7 +51,13 @@ jobs:
       - name: Test runtime (Level 1)
         run: |
           echo "Running runtime directly to test structural validity"
-          ./runtime-${{ matrix.arch }} --appimage-help || true
+          if [ "${{ matrix.arch }}" = "aarch64" ]; then
+            qemu-aarch64-static ./runtime-${{ matrix.arch }} --appimage-help || true
+          elif [ "${{ matrix.arch }}" = "armv7l" ]; then
+            qemu-arm-static ./runtime-${{ matrix.arch }} --appimage-help || true
+          else
+            ./runtime-${{ matrix.arch }} --appimage-help || true
+          fi
 
       - name: Test AppImage with gzip (Level 2)
         run: ./scripts/test_appimage.sh test_gzip.AppImage ${{ matrix.arch }}

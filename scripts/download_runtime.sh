@@ -17,9 +17,13 @@ if [ "$ARCH" = "armv7l" ]; then
     DL_ARCH="armhf"
 fi
 
-# If RUNTIME_URL is set, use it. Otherwise fallback to continuous release of type2-runtime
+# If RUNTIME_URL is set, use it. If it ends with a slash, append runtime-${ARCH}
 if [ -n "$RUNTIME_URL" ]; then
-    URL="$RUNTIME_URL"
+    if [[ "$RUNTIME_URL" == */ ]]; then
+        URL="${RUNTIME_URL}runtime-${ARCH}"
+    else
+        URL="$RUNTIME_URL"
+    fi
 else
     # Default to AppImageKit's type2-runtime for testing the framework
     URL="https://github.com/AppImage/type2-runtime/releases/download/continuous/runtime-${DL_ARCH}"

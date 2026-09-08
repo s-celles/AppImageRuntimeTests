@@ -8,6 +8,10 @@
 #define ARCH "aarch64"
 #elif defined(__arm__)
 #define ARCH "armv7l"
+#elif defined(__powerpc__) || defined(__PPC64__)
+#define ARCH "powerpc64le"
+#elif defined(__riscv) || defined(__riscv__)
+#define ARCH "riscv64"
 #else
 #define ARCH "unknown"
 #endif

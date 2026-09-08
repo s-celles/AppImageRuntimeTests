@@ -18,7 +18,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        arch: [x86_64, i686, aarch64, armv7l]
+        arch: [x86_64, i686, aarch64, armv7l, powerpc64le, riscv64]
     steps:
       - uses: actions/checkout@v4
 
@@ -27,6 +27,7 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y \
             gcc gcc-i686-linux-gnu gcc-aarch64-linux-gnu gcc-arm-linux-gnueabihf \
+            gcc-powerpc64le-linux-gnu gcc-riscv64-linux-gnu \
             libc6-dev squashfs-tools zstd file curl \
             qemu-user-static qemu-user \
             fuse libfuse2
@@ -55,6 +56,10 @@ jobs:
             qemu-aarch64-static ./runtime-${{ matrix.arch }} --appimage-help || true
           elif [ "${{ matrix.arch }}" = "armv7l" ]; then
             qemu-arm-static ./runtime-${{ matrix.arch }} --appimage-help || true
+          elif [ "${{ matrix.arch }}" = "powerpc64le" ]; then
+            qemu-ppc64le-static ./runtime-${{ matrix.arch }} --appimage-help || true
+          elif [ "${{ matrix.arch }}" = "riscv64" ]; then
+            qemu-riscv64-static ./runtime-${{ matrix.arch }} --appimage-help || true
           else
             ./runtime-${{ matrix.arch }} --appimage-help || true
           fi

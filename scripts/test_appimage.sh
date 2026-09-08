@@ -28,6 +28,10 @@ if [ "$ARCH" = "aarch64" ]; then
     QEMU="qemu-aarch64-static"
 elif [ "$ARCH" = "armv7l" ]; then
     QEMU="qemu-arm-static"
+elif [ "$ARCH" = "powerpc64le" ]; then
+    QEMU="qemu-ppc64le-static"
+elif [ "$ARCH" = "riscv64" ]; then
+    QEMU="qemu-riscv64-static"
 elif [ "$ARCH" = "i686" ]; then
     # Native on x86_64 or explicit qemu if needed
     QEMU=""

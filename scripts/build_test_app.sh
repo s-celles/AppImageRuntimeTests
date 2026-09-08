@@ -23,6 +23,12 @@ case "$ARCH" in
     armv7l)
         CC="arm-linux-gnueabihf-gcc"
         ;;
+    powerpc64le)
+        CC="powerpc64le-linux-gnu-gcc"
+        ;;
+    riscv64)
+        CC="riscv64-linux-gnu-gcc"
+        ;;
     *)
         echo "Unsupported architecture: $ARCH"
         exit 1

@@ -2,25 +2,29 @@
 set -e
 
 if [ -z "$1" ]; then
-    echo "Usage: $0 <arch>"
-    echo "Supported arch: x86_64, i686, aarch64, armv7l"
+    echo "Usage: $0 <arch> <libc>"
+    echo "Supported arch: x86_64, i686, aarch64, armv7l, armv6l, powerpc64le, riscv64"
     exit 1
 fi
 
 ARCH="$1"
+LIBC="$2"
 OUTPUT_FILE="runtime-${ARCH}"
+if [ -n "$LIBC" ]; then
+    OUTPUT_FILE="runtime-${ARCH}-${LIBC}"
+fi
 
 # Map our arch names to AppImageKit/type2-runtime names if necessary
 # AppImage type2-runtime uses aarch64, x86_64, i686, armhf
 DL_ARCH="$ARCH"
-if [ "$ARCH" = "armv7l" ]; then
+if [ "$ARCH" = "armv7l" ] || [ "$ARCH" = "armv6l" ]; then
     DL_ARCH="armhf"
 fi
 
-# If RUNTIME_URL is set, use it. If it ends with a slash, append runtime-${ARCH}
+# If RUNTIME_URL is set, use it. If it ends with a slash, append runtime-${ARCH}-${LIBC}
 if [ -n "$RUNTIME_URL" ]; then
     if [[ "$RUNTIME_URL" == */ ]]; then
-        URL="${RUNTIME_URL}runtime-${ARCH}"
+        URL="${RUNTIME_URL}runtime-${ARCH}-${LIBC}"
     else
         URL="$RUNTIME_URL"
     fi

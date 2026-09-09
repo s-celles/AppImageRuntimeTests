@@ -20,16 +20,40 @@ jobs:
       matrix:
         include:
           - arch: x86_64
+            libc: gnu
+            experimental: false
+          - arch: x86_64
+            libc: musl
             experimental: false
           - arch: i686
+            libc: gnu
+            experimental: false
+          - arch: i686
+            libc: musl
             experimental: false
           - arch: aarch64
+            libc: gnu
+            experimental: false
+          - arch: aarch64
+            libc: musl
+            experimental: false
+          - arch: armv6l
+            libc: gnueabihf
+            experimental: true
+          - arch: armv6l
+            libc: musleabihf
+            experimental: true
+          - arch: armv7l
+            libc: gnueabihf
             experimental: false
           - arch: armv7l
+            libc: musleabihf
             experimental: false
           - arch: powerpc64le
+            libc: gnu
             experimental: true
           - arch: riscv64
+            libc: gnu
             experimental: true
     continue-on-error: ${{ matrix.experimental }}
     steps:
@@ -55,26 +79,28 @@ jobs:
       - name: Download runtime
         env:
           RUNTIME_URL: ${{ inputs.runtime_url }}
-        run: ./scripts/download_runtime.sh ${{ matrix.arch }}
+        run: ./scripts/download_runtime.sh ${{ matrix.arch }} ${{ matrix.libc }}
 
       - name: Build AppImages
         run: |
-          ./scripts/build_appimage.sh runtime-${{ matrix.arch }} test_app_${{ matrix.arch }} gzip test_gzip.AppImage
-          ./scripts/build_appimage.sh runtime-${{ matrix.arch }} test_app_${{ matrix.arch }} zstd test_zstd.AppImage
+          ./scripts/build_appimage.sh runtime-${{ matrix.arch }}-${{ matrix.libc }} test_app_${{ matrix.arch }} gzip test_gzip.AppImage
+          ./scripts/build_appimage.sh runtime-${{ matrix.arch }}-${{ matrix.libc }} test_app_${{ matrix.arch }} zstd test_zstd.AppImage
 
       - name: Test runtime (Level 1)
         run: |
           echo "Running runtime directly to test structural validity"
           if [ "${{ matrix.arch }}" = "aarch64" ]; then
-            qemu-aarch64-static ./runtime-${{ matrix.arch }} --appimage-help || true
+            qemu-aarch64-static ./runtime-${{ matrix.arch }}-${{ matrix.libc }} --appimage-help || true
+          elif [ "${{ matrix.arch }}" = "armv6l" ]; then
+            qemu-arm-static ./runtime-${{ matrix.arch }}-${{ matrix.libc }} --appimage-help || true
           elif [ "${{ matrix.arch }}" = "armv7l" ]; then
-            qemu-arm-static ./runtime-${{ matrix.arch }} --appimage-help || true
+            qemu-arm-static ./runtime-${{ matrix.arch }}-${{ matrix.libc }} --appimage-help || true
           elif [ "${{ matrix.arch }}" = "powerpc64le" ]; then
-            qemu-ppc64le-static ./runtime-${{ matrix.arch }} --appimage-help || true
+            qemu-ppc64le-static ./runtime-${{ matrix.arch }}-${{ matrix.libc }} --appimage-help || true
           elif [ "${{ matrix.arch }}" = "riscv64" ]; then
-            qemu-riscv64-static ./runtime-${{ matrix.arch }} --appimage-help || true
+            qemu-riscv64-static ./runtime-${{ matrix.arch }}-${{ matrix.libc }} --appimage-help || true
           else
-            ./runtime-${{ matrix.arch }} --appimage-help || true
+            ./runtime-${{ matrix.arch }}-${{ matrix.libc }} --appimage-help || true
           fi
 
       - name: Test AppImage with gzip (Level 2)

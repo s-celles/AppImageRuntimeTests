@@ -24,7 +24,7 @@ case "$ARCH" in
         CC="arm-linux-gnueabihf-gcc"
         ;;
     armv6l)
-        CC="arm-linux-gnueabihf-gcc -march=armv6 -DARCH_ARMV6L"
+        CC="arm-linux-gnueabi-gcc -march=armv6 -DARCH_ARMV6L"
         ;;
     powerpc64le)
         CC="powerpc64le-linux-gnu-gcc"

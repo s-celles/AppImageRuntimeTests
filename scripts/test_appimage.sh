@@ -26,7 +26,7 @@ fi
 QEMU=""
 if [ "$ARCH" = "aarch64" ]; then
     QEMU="qemu-aarch64-static"
-elif [ "$ARCH" = "armv7l" ]; then
+elif [ "$ARCH" = "armv7l" ] || [ "$ARCH" = "armv6l" ]; then
     QEMU="qemu-arm-static"
 elif [ "$ARCH" = "powerpc64le" ]; then
     QEMU="qemu-ppc64le-static"
